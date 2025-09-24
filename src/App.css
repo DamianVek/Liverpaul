@@ -1,0 +1,142 @@
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fa;
+  color: #333;
+  line-height: 1.5;
+}
+
+
+header {
+  background-color: #222;
+  color: white; 
+  padding: 15px 20px;
+  text-align: center;
+  border-bottom: 3px solid #007bff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+h1, h2, h3 {
+  margin-bottom: 0.5em;
+}
+
+
+.botones-nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.botones-nav button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.botones-nav button:hover {
+  background-color: #0056b3;
+}
+
+.botones-nav button:active {
+  transform: scale(0.95);
+}
+
+.botones-nav .activo {
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+}
+.btn-danger:hover {
+  background-color: #a71d2a;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+}
+.btn-secondary:hover {
+  background-color: #565e64;
+}
+
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  width: 95%;
+  box-sizing: border-box;
+}
+
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+
+.table-container {
+  overflow-x: auto; 
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.table th {
+  background-color: #f0f0f0;
+  text-align: left;
+}
+
+
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .botones-nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .botones-nav button {
+    width: 100%;
+    max-width: unset;
+  }
+}
