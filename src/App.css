@@ -1,80 +1,20 @@
-
 body {
-  font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+  font-family: 'Inter', 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f5f7fa;
-  color: #333;
+  background-color: #121212;
+  color: #fff;
   line-height: 1.5;
 }
 
 
 header {
-  background-color: #222;
+  background-color: #000;
   color: white; 
   padding: 15px 20px;
   text-align: center;
-  border-bottom: 3px solid #007bff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-h1, h2, h3 {
-  margin-bottom: 0.5em;
-}
-
-
-.botones-nav {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
-  flex-wrap: wrap;
-}
-
-.botones-nav button {
-  padding: 10px 20px;
-  border-radius: 6px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.botones-nav button:hover {
-  background-color: #0056b3;
-}
-
-.botones-nav button:active {
-  transform: scale(0.95);
-}
-
-.botones-nav .activo {
-  background: linear-gradient(90deg, #007bff, #0056b3);
-  color: white;
-  font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-}
-.btn-danger:hover {
-  background-color: #a71d2a;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-}
-.btn-secondary:hover {
-  background-color: #565e64;
+  border-bottom: 2px solid #007bff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
 
@@ -88,33 +28,87 @@ button:disabled {
 
 
 .card {
-  background: white;
-  border-radius: 10px;
+  background: #1c1c1c;
+  border-radius: 12px;
   padding: 20px;
-  margin: 15px 0;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-  text-align: left;
+  margin: 20px 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 
-.table-container {
-  overflow-x: auto; 
-}
-
-.table {
+input, select, textarea {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+  padding: 10px 14px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #1e1e1e;
+  color: #fff;
+  margin: 10px 0;
+  box-sizing: border-box;
+  font-size: 1rem;
 }
 
-.table th, .table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.5);
 }
 
-.table th {
-  background-color: #f0f0f0;
-  text-align: left;
+
+button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+.btn-secondary:hover {
+  background-color: #565e64;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #a71d2a;
+}
+
+
+.botones-nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.botones-nav button {
+  flex: 1;
+  min-width: 120px;
+}
+
+
+.card img {
+  display: block;
+  margin: 10px auto;
+  border-radius: 10px;
+  max-width: 100%;
+  height: auto;
 }
 
 
@@ -122,12 +116,6 @@ button:disabled {
   .container {
     max-width: 100%;
     padding: 15px;
-  }
-}
-
-@media (max-width: 600px) {
-  h1 {
-    font-size: 1.4rem;
   }
 
   .botones-nav {
@@ -137,6 +125,82 @@ button:disabled {
 
   .botones-nav button {
     width: 100%;
-    max-width: unset;
+  }
+}
+
+
+.nav-bar {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 15px;
+  background: #111;
+  border-bottom: 2px solid #007bff;
+}
+
+.nav-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: transparent;
+  color: white;
+  border: 1px solid #444;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  background: #007bff33;
+  border-color: #007bff;
+}
+
+.nav-btn.activo {
+  background: #007bff;
+  border-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+
+.tab-bar {
+  display: none; 
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #111;
+  border-top: 2px solid #007bff;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 5px 0;
+}
+
+.tab-btn.activo {
+  color: #007bff;
+  font-weight: bold;
+}
+
+
+@media (min-width: 769px) {
+  .tab-bar {
+    display: none; 
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    display: none; 
+  }
+  .tab-bar {
+    display: flex; 
   }
 }

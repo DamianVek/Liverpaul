@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { db } from '../firebase';
-import { collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../firebase';
+import { useState } from "react";
+import { db } from "../firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 function OrdenForm() {
-  const [formulario, setFormulario] = useState({
+  const [orden, setOrden] = useState({
     modelo: "",
     falla: "",
     refacciones: "",
@@ -14,72 +12,26 @@ function OrdenForm() {
     costoMano: "",
     notas: "",
     fechaEntrega: "",
-    adelanto: ""
+    adelanto: "",
+    total: "",
+    fechaIngreso: new Date().toLocaleDateString(),
+    estatus: "pendiente",
   });
-
-  const [fotoDelantera, setFotoDelantera] = useState(null);
-  const [fotoTrasera, setFotoTrasera] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormulario(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setOrden({
+      ...orden,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    if (files.length === 0) return;
-
-    if (name === 'fotoDelantera') {
-      setFotoDelantera(files[0]);
-    } else if (name === 'fotoTrasera') {
-      setFotoTrasera(files[0]);
-    }
-  };
-
-  const calcularTotal = () => {
-    const refacciones = parseFloat(formulario.costoRefacciones) || 0;
-    const manoObra = parseFloat(formulario.costoMano) || 0;
-    const adelanto = parseFloat(formulario.adelanto) || 0;
-    return refacciones + manoObra - adelanto;
-  };
-
-  const subirArchivo = async (file, nombreArchivo) => {
-    if (!file) return null;
-    const storageRef = ref(storage, `ordenes/${nombreArchivo}-${Date.now()}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    return url;
-  }
-
-  const handleGuardarOrden = async () => {
-    if (!formulario.modelo || !formulario.falla) {
-      alert("Requisito mínimo para una orden: modelo y falla.");
-      return;
-    }
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const totalCalculado = calcularTotal();
-
-      const urlFotoDelantera = await subirArchivo(fotoDelantera, 'fotoDelantera');
-      const urlFotoTrasera = await subirArchivo(fotoTrasera, 'fotoTrasera');
-
-      const ordenParaGuardar = {
-        ...formulario,
-        total: totalCalculado,
-        fechaIngreso: new Date().toISOString().split("T")[0],
-        urlFotoDelantera,
-        urlFotoTrasera,
-      };
-
-      await addDoc(collection(db, "ordenes"), ordenParaGuardar);
-      console.log("Orden guardada:", ordenParaGuardar);
-      alert("Orden guardada exitosamente");
-
-      
-      setFormulario({
+      await addDoc(collection(db, "ordenes"), orden);
+      alert("Orden registrada con éxito");
+      setOrden({
         modelo: "",
         falla: "",
         refacciones: "",
@@ -88,154 +40,148 @@ function OrdenForm() {
         costoMano: "",
         notas: "",
         fechaEntrega: "",
-        adelanto: ""
+        adelanto: "",
+        total: "",
+        fechaIngreso: new Date().toLocaleDateString(),
+        estatus: "pendiente",
       });
-      setFotoDelantera(null);
-      setFotoTrasera(null);
-
     } catch (error) {
-      console.error("Error al guardar la orden:", error.message);
-      alert("Ocurrió un error al guardar la orden");
+      console.error("Error al registrar la orden:", error);
+      alert("No se pudo registrar la orden");
     }
   };
 
   return (
-    <form>
-      <h2>Ingresa las características del nuevo equipo a reparar</h2>
+    <div className="container">
+      <h2>Nueva Orden</h2>
+      <form onSubmit={handleSubmit} className="card">
+    
+        <label>Modelo:</label>
+        <input
+          type="text"
+          name="modelo"
+          value={orden.modelo}
+          onChange={handleChange}
+          placeholder="Ej. iPhone 12"
+          required
+        />
 
-      <label>Introduce el modelo del dispositivo</label>
-      <input
-        type="text"
-        name='modelo'
-        placeholder='iPhone X'
-        value={formulario.modelo}
-        onChange={handleChange}
-      />
-      <br />
+      
+        <label>Falla:</label>
+        <input
+          type="text"
+          name="falla"
+          value={orden.falla}
+          onChange={handleChange}
+          placeholder="Ej. No carga"
+          required
+        />
 
-      <label>¿Cuál es la falla del dispositivo?</label>
-      <input
-        type="text"
-        name='falla'
-        placeholder='Cambio de pantalla'
-        value={formulario.falla}
-        onChange={handleChange}
-      />
-      <br />
+       
+        <label>Refacciones:</label>
+        <input
+          type="text"
+          name="refacciones"
+          value={orden.refacciones}
+          onChange={handleChange}
+        />
 
-      <label>Refacciones necesarias</label>
-      <input
-        type="text"
-        name='refacciones'
-        placeholder='Pantalla iPhone X'
-        value={formulario.refacciones}
-        onChange={handleChange}
-      />
-      <br />
+       
+        <label>Costo de refacciones:</label>
+        <input
+          type="number"
+          name="costoRefacciones"
+          value={orden.costoRefacciones}
+          onChange={handleChange}
+        />
 
-      <label>Costo de las piezas</label>
-      <input
-        type="password"
-        name='costoRefacciones'
-        value={formulario.costoRefacciones}
-        onChange={handleChange}
-      />
-      <br />
+        
+        <label>
+          <input
+            type="checkbox"
+            name="enciende"
+            checked={orden.enciende}
+            onChange={handleChange}
+          />
+          ¿Enciende?
+        </label>
 
-      <label>¿El equipo enciende?</label>
-      <input
-        type="checkbox"
-        name='enciende'
-        checked={formulario.enciende}
-        onChange={handleChange}
-      />
-      <br />
+        
+        <label>Costo de mano de obra:</label>
+        <input
+          type="number"
+          name="costoMano"
+          value={orden.costoMano}
+          onChange={handleChange}
+        />
 
-      <label>Costo de la mano de obra</label>
-      <input
-        type="password"
-        name='costoMano'
-        value={formulario.costoMano}
-        onChange={handleChange}
-      />
-      <br />
+        
+        <label>Notas:</label>
+        <textarea
+          name="notas"
+          value={orden.notas}
+          onChange={handleChange}
+          placeholder="Notas adicionales..."
+          rows="3"
+        ></textarea>
 
-      <label>Notas adicionales</label>
-      <textarea
-        name='notas'
-        rows={5}
-        cols={30}
-        placeholder='Introduce notas adicionales'
-        value={formulario.notas}
-        onChange={handleChange}
-      />
-      <br />
+        
+        <label>Fecha de entrega:</label>
+        <input
+          type="date"
+          name="fechaEntrega"
+          value={orden.fechaEntrega}
+          onChange={handleChange}
+        />
 
-      <label>Fecha de entrega</label>
-      <input
-        type="date"
-        name="fechaEntrega"
-        value={formulario.fechaEntrega}
-        onChange={handleChange}
-      />
-      <br />
+        
+        <label>Adelanto:</label>
+        <input
+          type="number"
+          name="adelanto"
+          value={orden.adelanto}
+          onChange={handleChange}
+        />
 
-      <label>Adelanto de pago</label>
-      <input
-        type="text"
-        name="adelanto"
-        value={formulario.adelanto}
-        onChange={handleChange}
-      />
-      <p><strong>Restante por cobrar:</strong> ${calcularTotal()}</p>
+        
+        <label>Total por cobrar:</label>
+        <input
+          type="number"
+          name="total"
+          value={orden.total}
+          onChange={handleChange}
+        />
 
-      <br />
-      <label>Foto de la parte trasera del dispositivo</label>
-      <input
-        type="file"
-        name="fotoTrasera"
-        accept="image/*"
-        capture="environment"
-        onChange={handleFileChange}
-      />
-      <br />
-
-      <label>Foto de la parte delantera del dispositivo</label>
-      <input 
-        type="file" 
-        name="fotoDelantera"
-        accept="image/*"
-        capture="environment"
-        onChange={handleFileChange}
-      />
-      <br />
-
-      <div style={{display: "flex"}}>
-      {fotoDelantera && (
-        <div>
-          <p>Vista previa - Foto delantera:</p>
-          <button onClick={() => setFotoDelantera(null)}>Eliminar foto</button>
-          <br />
-          <img src={URL.createObjectURL(fotoDelantera)} alt="Foto Delantera" width={150} />
+       
+        <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
+          <button type="submit" className="btn-primary">
+            Guardar orden
+          </button>
+          <button
+            type="reset"
+            onClick={() =>
+              setOrden({
+                modelo: "",
+                falla: "",
+                refacciones: "",
+                costoRefacciones: "",
+                enciende: false,
+                costoMano: "",
+                notas: "",
+                fechaEntrega: "",
+                adelanto: "",
+                total: "",
+                fechaIngreso: new Date().toLocaleDateString(),
+                estatus: "pendiente",
+              })
+            }
+            className="btn-secondary"
+          >
+            Limpiar
+          </button>
         </div>
-      )}
-
-      {fotoTrasera && (
-        <div>
-          <p>Vista previa - Foto trasera:</p>
-          <button onClick={() => setFotoTrasera(null)}>Eliminar foto</button>
-          <br />
-          <img src={URL.createObjectURL(fotoTrasera)} alt="Foto Trasera" width={150} />
-        </div>
-      )}
-      </div>
-
-
-      <br />
-      <button type="button" onClick={handleGuardarOrden}>
-        Guardar orden
-      </button>
-    </form>
+      </form>
+    </div>
   );
 }
 
