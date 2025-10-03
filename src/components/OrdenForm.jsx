@@ -1,188 +1,121 @@
+// src/pages/NuevaOrden.jsx
 import { useState } from "react";
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 
-function OrdenForm() {
+function NuevaOrden() {
   const [orden, setOrden] = useState({
-    modelo: "",
-    falla: "",
-    refacciones: "",
-    costoRefacciones: "",
-    enciende: false,
+    cliente: "",
+    telefono: "",
+    descripcion: "",
     costoMano: "",
-    notas: "",
-    fechaEntrega: "",
-    adelanto: "",
-    total: "",
-    fechaIngreso: new Date().toLocaleDateString(),
-    estatus: "pendiente",
+    costoRefacciones: "",
+    fecha: new Date().toISOString(),
+    imagen: ""
   });
+  const [subiendo, setSubiendo] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setOrden({
-      ...orden,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    const { name, value } = e.target;
+    setOrden((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleGuardar = async () => {
+    if (!orden.cliente || !orden.descripcion) {
+      alert("Por favor completa cliente y descripción");
+      return;
+    }
+
     try {
+      setSubiendo(true);
       await addDoc(collection(db, "ordenes"), orden);
-      alert("Orden registrada con éxito");
+      alert("✅ Orden guardada correctamente.");
       setOrden({
-        modelo: "",
-        falla: "",
-        refacciones: "",
-        costoRefacciones: "",
-        enciende: false,
+        cliente: "",
+        telefono: "",
+        descripcion: "",
         costoMano: "",
-        notas: "",
-        fechaEntrega: "",
-        adelanto: "",
-        total: "",
-        fechaIngreso: new Date().toLocaleDateString(),
-        estatus: "pendiente",
+        costoRefacciones: "",
+        fecha: new Date().toISOString(),
+        imagen: ""
       });
     } catch (error) {
-      console.error("Error al registrar la orden:", error);
-      alert("No se pudo registrar la orden");
+      console.error("Error al guardar la orden:", error);
+      alert("❌ Ocurrió un error al guardar la orden.");
+    } finally {
+      setSubiendo(false);
     }
   };
 
   return (
     <div className="container">
-      <h2>Nueva Orden</h2>
-      <form onSubmit={handleSubmit} className="card">
-    
-        <label>Modelo:</label>
+      <h2>📝 Nueva Orden</h2>
+      <p className="center-text">Registra aquí una nueva orden de trabajo</p>
+
+      <div className="card">
+        <label>Cliente</label>
         <input
           type="text"
-          name="modelo"
-          value={orden.modelo}
+          name="cliente"
+          value={orden.cliente}
           onChange={handleChange}
-          placeholder="Ej. iPhone 12"
-          required
+          placeholder="Nombre del cliente"
         />
 
-      
-        <label>Falla:</label>
+        <label>Teléfono</label>
         <input
           type="text"
-          name="falla"
-          value={orden.falla}
+          name="telefono"
+          value={orden.telefono}
           onChange={handleChange}
-          placeholder="Ej. No carga"
-          required
+          placeholder="Ej: 5512345678"
         />
 
-       
-        <label>Refacciones:</label>
-        <input
-          type="text"
-          name="refacciones"
-          value={orden.refacciones}
+        <label>Descripción</label>
+        <textarea
+          name="descripcion"
+          value={orden.descripcion}
           onChange={handleChange}
-        />
+          placeholder="Describe el servicio a realizar"
+        ></textarea>
 
-       
-        <label>Costo de refacciones:</label>
-        <input
-          type="number"
-          name="costoRefacciones"
-          value={orden.costoRefacciones}
-          onChange={handleChange}
-        />
-
-        
-        <label>
-          <input
-            type="checkbox"
-            name="enciende"
-            checked={orden.enciende}
-            onChange={handleChange}
-          />
-          ¿Enciende?
-        </label>
-
-        
-        <label>Costo de mano de obra:</label>
+        <label>Costo de mano de obra</label>
         <input
           type="number"
           name="costoMano"
           value={orden.costoMano}
           onChange={handleChange}
+          placeholder="0.00"
         />
 
-        
-        <label>Notas:</label>
-        <textarea
-          name="notas"
-          value={orden.notas}
-          onChange={handleChange}
-          placeholder="Notas adicionales..."
-          rows="3"
-        ></textarea>
-
-        
-        <label>Fecha de entrega:</label>
-        <input
-          type="date"
-          name="fechaEntrega"
-          value={orden.fechaEntrega}
-          onChange={handleChange}
-        />
-
-        
-        <label>Adelanto:</label>
+        <label>Costo de refacciones</label>
         <input
           type="number"
-          name="adelanto"
-          value={orden.adelanto}
+          name="costoRefacciones"
+          value={orden.costoRefacciones}
           onChange={handleChange}
+          placeholder="0.00"
         />
 
-        
-        <label>Total por cobrar:</label>
+        <label>Imagen (opcional, URL)</label>
         <input
-          type="number"
-          name="total"
-          value={orden.total}
+          type="text"
+          name="imagen"
+          value={orden.imagen}
           onChange={handleChange}
+          placeholder="Pega aquí la URL de la imagen"
         />
 
-       
-        <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
-          <button type="submit" className="btn-primary">
-            Guardar orden
-          </button>
-          <button
-            type="reset"
-            onClick={() =>
-              setOrden({
-                modelo: "",
-                falla: "",
-                refacciones: "",
-                costoRefacciones: "",
-                enciende: false,
-                costoMano: "",
-                notas: "",
-                fechaEntrega: "",
-                adelanto: "",
-                total: "",
-                fechaIngreso: new Date().toLocaleDateString(),
-                estatus: "pendiente",
-              })
-            }
-            className="btn-secondary"
-          >
-            Limpiar
-          </button>
-        </div>
-      </form>
+        <button
+          className="btn-primary"
+          onClick={handleGuardar}
+          disabled={subiendo}
+        >
+          {subiendo ? "Guardando..." : "Guardar Orden"}
+        </button>
+      </div>
     </div>
   );
 }
 
-export default OrdenForm;
+export default NuevaOrden;

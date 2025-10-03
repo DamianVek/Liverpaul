@@ -1,183 +1,136 @@
-import { useEffect, useState } from "react";
-import { db } from "../firebase";
-import { collection, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { useState } from "react";
 
 function VerOrdenes() {
-  const [ordenes, setOrdenes] = useState([]);
-  const [ordenSeleccionada, setOrdenSeleccionada] = useState(null);
+  const [ordenes, setOrdenes] = useState([
+    {
+      id: 1,
+      cliente: "Carlos Pérez",
+      equipo: "iPhone 13",
+      problema: "Pantalla rota",
+      costo: 2500,
+      estado: "En Proceso",
+      imagen: "https://via.placeholder.com/300x200", // ejemplo
+    },
+    {
+      id: 2,
+      cliente: "María López",
+      equipo: "Laptop Dell",
+      problema: "No enciende",
+      costo: 1800,
+      estado: "Pendiente",
+      imagen: "https://via.placeholder.com/300x200",
+    },
+  ]);
 
-  useEffect(() => {
-    const unsuscribe = onSnapshot(collection(db, "ordenes"), (snapshot) => {
-      const listas = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setOrdenes(listas);
-    });
+  const [imagenModal, setImagenModal] = useState(null);
 
-    return () => unsuscribe();
-  }, []);
-
-  const eliminarOrden = async (id) => {
-    try {
-      await deleteDoc(doc(db, "ordenes", id));
-      alert("Orden eliminada.");
-    } catch (error) {
-      console.error("Error al eliminar orden", error);
-      alert("No se pudo eliminar la orden");
-    }
+  // Finalizar una orden
+  const finalizarOrden = (id) => {
+    setOrdenes(
+      ordenes.map((o) =>
+        o.id === id ? { ...o, estado: "Finalizado" } : o
+      )
+    );
   };
 
-  const actualizarOrden = async (orden) => {
-    try {
-      const ref = doc(db, "ordenes", orden.id);
-      await updateDoc(ref, {
-        modelo: orden.modelo,
-        falla: orden.falla,
-        estatus: orden.estatus,
-      });
-      alert("Orden actualizada correctamente.");
-      setOrdenSeleccionada(null);
-    } catch (error) {
-      console.error("Error al actualizar:", error);
-      alert("No se pudo actualizar la orden.");
-    }
+  // Eliminar una orden
+  const eliminarOrden = (id) => {
+    setOrdenes(ordenes.filter((o) => o.id !== id));
   };
 
   return (
-    <div className="container">
-      <h2>Órdenes Registradas</h2>
+    <div>
+      <h2>📋 Órdenes de Reparación</h2>
+
       {ordenes.length === 0 ? (
-        <p>No hay órdenes registradas.</p>
+        <p className="center-text">No hay órdenes registradas.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {ordenes.map((ord) => (
-            <li key={ord.id} className="card">
-              <h3>{ord.modelo}</h3>
+        ordenes.map((orden) => (
+          <div key={orden.id} className="card">
+            <h3>👤 Cliente: {orden.cliente}</h3>
+            <p><strong>Equipo:</strong> {orden.equipo}</p>
+            <p><strong>Problema:</strong> {orden.problema}</p>
+            <p><strong>Costo:</strong> ${orden.costo}</p>
+            <p>
+              <strong>Estado:</strong>{" "}
+              <span
+                style={{
+                  color:
+                    orden.estado === "Finalizado"
+                      ? "#28a745"
+                      : orden.estado === "En Proceso"
+                      ? "#ffc107"
+                      : "#dc3545",
+                }}
+              >
+                {orden.estado}
+              </span>
+            </p>
 
-              <p>
-                <strong>Estatus:</strong>{" "}
-                <span
-                  style={{
-                    color: ord.estatus === "finalizada" ? "#4caf50" : "#ffc107",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {ord.estatus}
-                </span>
-              </p>
+            {/* Imagen con modal */}
+            {orden.imagen && (
+              <img
+                src={orden.imagen}
+                alt="Evidencia"
+                onClick={() => setImagenModal(orden.imagen)}
+              />
+            )}
 
-              <p><strong>Falla:</strong> {ord.falla}</p>
-              <p><strong>Refacciones:</strong> {ord.refacciones}</p>
-              <p><strong>Costo refacciones:</strong> ${ord.costoRefacciones}</p>
-              <p><strong>¿Enciende?:</strong> {ord.enciende ? "Sí" : "No"}</p>
-              <p><strong>Costo mano de obra:</strong> ${ord.costoMano}</p>
-              <p><strong>Notas:</strong> {ord.notas}</p>
-              <p><strong>Fecha entrega:</strong> {ord.fechaEntrega}</p>
-              <p><strong>Adelanto:</strong> ${ord.adelanto}</p>
-              <p><strong>Total por cobrar:</strong> ${ord.total}</p>
-              <p><strong>Fecha ingreso:</strong> {ord.fechaIngreso}</p>
-
-              {/* Fotos */}
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                {ord.urlFotoDelantera && (
-                  <img
-                    src={ord.urlFotoDelantera}
-                    alt="Foto Delantera"
-                    width="120"
-                  />
-                )}
-                {ord.urlFotoTrasera && (
-                  <img
-                    src={ord.urlFotoTrasera}
-                    alt="Foto Trasera"
-                    width="120"
-                  />
-                )}
-              </div>
-
-              
-              <div style={{ marginTop: "15px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            {/* Botones de acción */}
+            <div className="flex-center gap-15">
+              {orden.estado !== "Finalizado" && (
                 <button
-                  onClick={() => setOrdenSeleccionada(ord)}
-                  className="btn-secondary"
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => eliminarOrden(ord.id)}
-                  className="btn-danger"
-                >
-                  Eliminar
-                </button>
-                <button
-                  onClick={() =>
-                    actualizarOrden({ ...ord, estatus: "finalizada" })
-                  }
                   className="btn-primary"
+                  onClick={() => finalizarOrden(orden.id)}
                 >
-                  Finalizar
+                  ✅ Finalizar
                 </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+              )}
+              <button
+                className="btn-secondary"
+                onClick={() => alert("Función de edición próximamente")}
+              >
+                ✏️ Editar
+              </button>
+              <button
+                className="btn-danger"
+                onClick={() => eliminarOrden(orden.id)}
+              >
+                🗑 Eliminar
+              </button>
+            </div>
+          </div>
+        ))
       )}
 
-      
-      {ordenSeleccionada && (
-        <div className="card">
-          <h3>Editar orden</h3>
-          <label>Modelo:</label>
-          <input
-            value={ordenSeleccionada.modelo}
-            onChange={(e) =>
-              setOrdenSeleccionada({
-                ...ordenSeleccionada,
-                modelo: e.target.value,
-              })
-            }
+      {/* Modal para imagen */}
+      {imagenModal && (
+        <div
+          className="modal"
+          onClick={() => setImagenModal(null)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 999,
+          }}
+        >
+          <img
+            src={imagenModal}
+            alt="Ampliada"
+            style={{
+              maxWidth: "90%",
+              maxHeight: "90%",
+              borderRadius: "12px",
+              boxShadow: "0 0 15px rgba(0,0,0,0.5)",
+            }}
           />
-
-          <label>Falla:</label>
-          <input
-            value={ordenSeleccionada.falla}
-            onChange={(e) =>
-              setOrdenSeleccionada({
-                ...ordenSeleccionada,
-                falla: e.target.value,
-              })
-            }
-          />
-
-          <label>Estatus:</label>
-          <select
-            value={ordenSeleccionada.estatus}
-            onChange={(e) =>
-              setOrdenSeleccionada({
-                ...ordenSeleccionada,
-                estatus: e.target.value,
-              })
-            }
-          >
-            <option value="pendiente">Pendiente</option>
-            <option value="finalizada">Finalizada</option>
-          </select>
-
-          <div style={{ marginTop: "15px", display: "flex", gap: "10px" }}>
-            <button
-              onClick={() => actualizarOrden(ordenSeleccionada)}
-              className="btn-primary"
-            >
-              Guardar
-            </button>
-            <button
-              onClick={() => setOrdenSeleccionada(null)}
-              className="btn-secondary"
-            >
-              Cancelar
-            </button>
-          </div>
         </div>
       )}
     </div>

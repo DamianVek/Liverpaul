@@ -4,63 +4,64 @@ import VerOrdenes from "./components/VerOrdenes";
 import ResumenFinanciero from "./components/ResumenFinanciero";
 
 function App() {
-  const [vista, setVista] = useState("ver");
+  const [pagina, setPagina] = useState("ordenForm"); // 🔹 Por default abre "Nueva Orden"
 
   return (
     <div>
-      
       <header>
-        <h1>Gestión de Órdenes</h1>
+        <h1>📱 Gestión de Reparaciones</h1>
       </header>
 
-      
+      {/* Navbar (PC) */}
       <nav className="nav-bar">
         <button
-          className={`nav-btn ${vista === "ver" ? "activo" : ""}`}
-          onClick={() => setVista("ver")}
-        >
-          📋 Ver Órdenes
-        </button>
-        <button
-          className={`nav-btn ${vista === "nueva" ? "activo" : ""}`}
-          onClick={() => setVista("nueva")}
+          className={`nav-btn ${pagina === "ordenForm" ? "activo" : ""}`}
+          onClick={() => setPagina("ordenForm")}
         >
           ➕ Nueva Orden
         </button>
         <button
-          className={`nav-btn ${vista === "finanzas" ? "activo" : ""}`}
-          onClick={() => setVista("finanzas")}
+          className={`nav-btn ${pagina === "verOrdenes" ? "activo" : ""}`}
+          onClick={() => setPagina("verOrdenes")}
+        >
+          📋 Ver Órdenes
+        </button>
+        <button
+          className={`nav-btn ${pagina === "finanzas" ? "activo" : ""}`}
+          onClick={() => setPagina("finanzas")}
         >
           💰 Finanzas
         </button>
       </nav>
 
-      <main className="container">
-        {vista === "ver" && <VerOrdenes />}
-        {vista === "nueva" && <OrdenForm />}
-        {vista === "finanzas" && <ResumenFinanciero />}
-      </main>
+      {/* Tab Bar (móviles) */}
+      <div className="tab-bar">
+        <button
+          className={`tab-btn ${pagina === "ordenForm" ? "activo" : ""}`}
+          onClick={() => setPagina("ordenForm")}
+        >
+          ➕ Orden
+        </button>
+        <button
+          className={`tab-btn ${pagina === "verOrdenes" ? "activo" : ""}`}
+          onClick={() => setPagina("verOrdenes")}
+        >
+          📋 Órdenes
+        </button>
+        <button
+          className={`tab-btn ${pagina === "finanzas" ? "activo" : ""}`}
+          onClick={() => setPagina("finanzas")}
+        >
+          💰 Finanzas
+        </button>
+      </div>
 
-      <footer className="tab-bar">
-        <button
-          className={`tab-btn ${vista === "ver" ? "activo" : ""}`}
-          onClick={() => setVista("ver")}
-        >
-          📋<br />Órdenes
-        </button>
-        <button
-          className={`tab-btn ${vista === "nueva" ? "activo" : ""}`}
-          onClick={() => setVista("nueva")}
-        >
-          ➕<br />Nueva
-        </button>
-        <button
-          className={`tab-btn ${vista === "finanzas" ? "activo" : ""}`}
-          onClick={() => setVista("finanzas")}
-        >
-          💰<br />Finanzas
-        </button>
-      </footer>
+      {/* Contenido dinámico */}
+      <div className="container">
+        {pagina === "ordenForm" && <OrdenForm />}
+        {pagina === "verOrdenes" && <VerOrdenes />}
+        {pagina === "finanzas" && <ResumenFinanciero />}
+      </div>
     </div>
   );
 }
